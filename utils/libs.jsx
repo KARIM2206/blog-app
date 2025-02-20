@@ -5,6 +5,19 @@ export const getPosts=async()=>{
     const data=await response.json()
     return data
 }
+export const getPostById=async(postId)=>{
+    
+    const response=await fetch(`http://ec2-3-76-10-130.eu-central-1.compute.amazonaws.com:4001/api/v1/posts/${postId}`)
+    const data=await response.json()
+    return data
+}
+export const getCatogeriesBySlug=async(slug)=>{
+    
+    const response =await fetch(`http://ec2-3-76-10-130.eu-central-1.compute.amazonaws.com:4001/api/v1/categories/s/${slug}`)
+
+        const data=await response.json()
+    return data
+}
 export const getCatogeries=async()=>{
     
     const response=await fetch("http://ec2-3-76-10-130.eu-central-1.compute.amazonaws.com:4001/api/v1/categories")

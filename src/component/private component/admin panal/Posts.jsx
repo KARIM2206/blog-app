@@ -4,37 +4,23 @@ import { Link, useNavigate } from 'react-router-dom';
 
 import { AuthContext } from '../../Context/Provider';
 import { getPosts } from '../../../../utils/libs';
+import UpdatePost from './UpdatePost';
 
 const Posts = () => {
-   const [posts, setPosts] = useState([]);
+  //  const [posts, setPosts] = useState([]);
    const [isDeleted,setIsDeleted]=useState(false)
    const[postId,setPostId]=useState("")
-   const{setPostItem}=useContext(AuthContext)
+   const{setPostItem,postItem}=useContext(AuthContext)
    const navigate=useNavigate()
    const {setUpdatePostData,token}=useContext(AuthContext)
-    useEffect(() => {
-        const fetchPosts = async () => {
-          const data = await getPosts();
-          console.log(data?.data?.posts?.length);
-          
-          if (data?.data?.posts) {
-            setPosts(data.data.posts); 
-            setPostItem(data.data.posts); 
-          } 
-          else {
-            console.error("Unexpected API response format:", data);
-          }
- 
-       
-        };
-    
-        fetchPosts();
-      }, []);  
-   console.log(posts);
+  
+
 const handleUpdate=(postId)=>{
   navigate(`/dashboard/posts/update/${postId}`)
-  const singlePost=posts.find(post=>post.id==postId)
+  const singlePost=postItem.find(post=>post.id==postId)
   setUpdatePostData(singlePost)
+
+  
 }   
  const handleDelete=(postId)=>{
 setIsDeleted(true)
@@ -68,7 +54,7 @@ setPostId(postId)
     console.log("Post Created Successfully:", responsePost);
 
     alert("category deleted successfully!");
-setPosts(c=>c.filter(e=>e.id!=postId))
+setPostItem(c=>c.filter(e=>e.id!=postId))
 setIsDeleted(false)
   } catch (error) {
     console.error("Error:", error);
@@ -93,30 +79,40 @@ setIsDeleted(false)
           </tr>
         </thead>
         <tbody>
-          {posts?.length ? posts?.map((post) => (
-            <tr key={post.id} className="border-b hover:bg-gray-50">
-              <td className="px-4 py-2 text-sm text-gray-700">{post.id}</td>
-              <td className="px-4 py-2 text-sm text-gray-700">{post.title}</td>
-              <td className="px-4 py-2 text-sm text-gray-700">{post.author.username}</td>
-              <td className="px-4 py-2 text-sm text-gray-700">{new Date(post.createdAt).toLocaleDateString()}</td>
-              <td className="px-4 py-2 text-sm">
-                <button
-                  onClick={() => handleUpdate(post.id)}
-                  className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 mr-2"
-                >
-                  Update
-                </button>
-                <button
-                  onClick={() => handleDelete(post.id)}
-                  className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
-                >
-                  Delete
-                </button>
-              </td>
-            </tr>
-          )) : <strong>No posts available</strong>}
-        
-        </tbody>
+  {postItem?.length ? (
+    postItem.map((post) => (
+      <tr key={post.id} className="border-b hover:bg-gray-50">
+        <td className="px-4 py-2 text-sm text-gray-700">{post.id}</td>
+        <td className="px-4 py-2 text-sm text-gray-700">{post.title}</td>
+        <td className="px-4 py-2 text-sm text-gray-700">{post.author.username}</td>
+        <td className="px-4 py-2 text-sm text-gray-700">
+          {new Date(post.createdAt).toLocaleDateString()}
+        </td>
+        <td className="px-4 py-2 text-sm">
+          <button
+            onClick={() => handleUpdate(post.id)}
+            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 mr-2"
+          >
+            Update
+          </button>
+          <button
+            onClick={() => handleDelete(post.id)}
+            className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
+          >
+            Delete
+          </button>
+        </td>
+      </tr>
+    ))
+  ) : (
+    <tr>
+      <td colSpan="5" className="px-4 py-2 text-center text-sm text-gray-700">
+        No posts available
+      </td>
+    </tr>
+  )}
+</tbody>
+
       </table>
       {
       isDeleted==true?<div className='flex flex-col px-2 py-1 gap-1.5 z-20 '>

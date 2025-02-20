@@ -11,14 +11,15 @@ const Create = () => {
   const [tags, setTags] = useState("");
 const [categoryiesItem,setCategoriesItem]=useState([])
   const { token } = useContext(AuthContext);
-  console.log(categories);
+
   
  const fetchCategories=async()=>{
      
   const categoriesFetch=await getCatogeries()
+    console.log(categoriesFetch);
     
-  const responseCategories=await categoriesFetch.data
- setCategoriesItem(responseCategories)
+ 
+ setCategoriesItem(categoriesFetch.data||[])
   console.log(categoryiesItem);
   
  }
@@ -67,77 +68,59 @@ useEffect(()=>{
  
     const handleSubmit = async (event) => {
       event.preventDefault();
-      console.log("Form submitted");
     
-    try {
-      
-      if (!title || !content || !categories) {
-        alert("Title, content, and categories are required.");
+      if (!title && !content && categories.length === 0) {
+        alert("Title, content, and at least one category are required.");
         return;
       }
-  
-      
-      const tagsArray = tags.split(",").map((tag) => tag.trim()).filter(Boolean);
-      if (tagsArray.length === 0) {
-        alert("At least one tag is required.");
-        return;
-      }
-  
-        const imageUrl = await uploadImg();
-        debugger
-        console.log("Uploaded Image URL:", imageUrl);
     
-        if (!imageUrl) {
-          alert("Image upload failed. Cannot proceed.");
+      try {
+        const tagsArray = tags.split(",").map((tag) => tag.trim()).filter(Boolean);
+        if (tagsArray.length === 0) {
+          alert("At least one tag is required.");
           return;
         }
     
-   
+        const imageUrl = await uploadImg();
+        if (!imageUrl) return;
+    
         const postData = {
           title,
           content,
-          cover: imageUrl,
+          cover: imageUrl, 
           published: true,
-          categories,
-          tags: tagsArray,
+          categories:categories.map(Number),
+          tags: tagsArray
         };
     
         console.log("Sending Post Data:", postData);
     
-        
         const postApi = await fetch(
           "http://ec2-3-76-10-130.eu-central-1.compute.amazonaws.com:4001/api/v1/posts",
           {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
-              "Authorization": `Bearer ${token}`,
+              Authorization: `Bearer ${token}`,
             },
             body: JSON.stringify(postData),
           }
         );
-    
-      
-        console.log("Response Status:", postApi.status);
-    
+   
         if (!postApi.ok) {
           const errorResponse = await postApi.json();
-          console.error("API Error Response:", errorResponse);
-          alert(`Post creation failed: ${errorResponse.message || "Unknown error"}`);
-          return;
+          throw new Error(`Post creation failed: ${errorResponse.message || "Unknown error"}`);
         }
     
         const responsePost = await postApi.json();
         console.log("Post Created Successfully:", responsePost);
     
         alert("Post created successfully!");
-        // navigate("/posts"); 
     
       } catch (error) {
         console.error("Error:", error);
         alert(error.message || "Something went wrong");
       }
-
     };
     
     
@@ -192,8 +175,8 @@ useEffect(()=>{
               id="categories"
             >
               {
-                categoryiesItem?.map((item,key)=>{
-                return  ( <option value={`${item.name}`} key={key}>{item.name}</option>)
+                categoryiesItem?.map((item)=>{
+                return  ( <option value={`${item.id}`} key={item.id}>{item.name}</option>)
                 })
               }
              

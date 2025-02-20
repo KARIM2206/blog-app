@@ -13,6 +13,8 @@ import CreateCategories from './component/private component/admin panal/CreateCa
 import UpdateCategories from './component/private component/admin panal/updateCategories';
 import UpdatePost from './component/private component/admin panal/UpdatePost';
 import LayoutNavbar from "./component/LayoutNavbar";
+import CategorySlug from "./component/CategorySlug"
+import PostDetails from './component/PostDetails';
 function App() {
   return (
     <Router>
@@ -20,8 +22,10 @@ function App() {
         {/* Public Routes */}
        <Route element={<LayoutNavbar/>}>
         <Route path="/" element={<Home />} />
+        <Route path="/category/:slug" element={<CategorySlug />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/posts/:id" element={<PostDetails />} />
 
         {/* Protected Routes */}
         <Route element={<PrivateRoute />}>

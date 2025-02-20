@@ -1,4 +1,5 @@
 import React, { createContext, useState, useEffect } from 'react';
+import { getPosts } from '../../../utils/libs';
 
 export const AuthContext = createContext();
 
@@ -25,6 +26,25 @@ if (!token) {
 }
 
 },[])
+useEffect(() => {
+    const fetchPosts = async () => {
+      const data = await getPosts();
+     
+      
+      if (data?.data?.posts.length) {
+        // setPosts(data.data.posts); 
+        setPostItem(data.data.posts); 
+
+      } 
+      else {
+        console.error("Unexpected API response format:", data);
+      }
+
+    
+    };
+
+    fetchPosts();
+  }, []);  
 const getUserInfo = async (token) => {
     try{
     const userInfoResponse = await fetch("http://ec2-3-76-10-130.eu-central-1.compute.amazonaws.com:4001/api/v1/users/@me", {
