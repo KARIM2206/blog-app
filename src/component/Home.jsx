@@ -5,7 +5,8 @@ import { AuthContext } from './Context/Provider'
 
 const Home = () => {
   const {postItem}=useContext(AuthContext)
-  console.log(postItem);
+  console.log(postItem)
+  console.log("postItem");
   const post =[
 {    title:"post title",
   content:"  Lorem ipsum dolor sit amet consectetur adipisicing elit. Hic facere magni molestias.",
@@ -20,7 +21,7 @@ const Home = () => {
   content:"  Lorem ipsum dolor sit amet consectetur adipisicing elit. Hic facere magni molestias.",
   cover:"/blogger.png",
   category:["vvv","nn"],
-  tags:['fkf','hkgogj'],
+  // tags:['fkf','hkgogj'],
   author:"karim",
   username:"yousef"
 
