@@ -8,8 +8,8 @@ const Layout = () => {
     
   return (
     <div className="flex h-screen mx-0">
-      <Sidebar />
-      <main className="flex-1 "><Outlet/></main>
+     <Sidebar />
+      <main className="w-full  "><Outlet/></main>
     </div>
   );
 };

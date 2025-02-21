@@ -5,7 +5,7 @@ const Sidebar = () => {
   const navigate = useNavigate();
   const [isActiveLink, setIsActiveLink] = useState("/posts");
   const location = useLocation();
-
+  const [isOpen, setIsOpen] = useState(false);
   useEffect(() => {
     navigate(`/dashboard${isActiveLink}`)
     // setIsActiveLink()

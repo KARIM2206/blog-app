@@ -7,7 +7,7 @@ const PrivateRoute = () => {
     const { isLogged } = useContext(AuthContext);
 const role=localStorage.getItem("role")
     if (!isLogged) {
-        console.log("islogged");
+     
         
        
         return <Navigate to="/login" />;

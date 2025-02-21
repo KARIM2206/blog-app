@@ -69,7 +69,7 @@ function Login() {
         }
         
     
-        console.log();
+        
     };
 
     return (

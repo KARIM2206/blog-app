@@ -10,17 +10,17 @@ const Create = () => {
   const [categories, setCategories] = useState([]);
   const [tags, setTags] = useState("");
 const [categoryiesItem,setCategoriesItem]=useState([])
-  const { token } = useContext(AuthContext);
+  const { token,setRenderPostPage } = useContext(AuthContext);
 
   
  const fetchCategories=async()=>{
      
   const categoriesFetch=await getCatogeries()
-    console.log(categoriesFetch);
+   
     
  
  setCategoriesItem(categoriesFetch.data||[])
-  console.log(categoryiesItem);
+ 
   
  }
 useEffect(()=>{
@@ -51,7 +51,7 @@ useEffect(()=>{
         );
   
         const imgResponse = await imgApi.json();
-  console.log(imgResponse);
+
   
         if (!imgResponse.data) {
           throw new Error("Image upload failed: No valid data returned");
@@ -93,7 +93,7 @@ useEffect(()=>{
           tags: tagsArray
         };
     
-        console.log("Sending Post Data:", postData);
+        console.log("Sending Post Data:", categories);
     
         const postApi = await fetch(
           "http://ec2-3-76-10-130.eu-central-1.compute.amazonaws.com:4001/api/v1/posts",
@@ -116,6 +116,7 @@ useEffect(()=>{
         console.log("Post Created Successfully:", responsePost);
     
         alert("Post created successfully!");
+        setRenderPostPage(prev=>prev+1)
     
       } catch (error) {
         console.error("Error:", error);
@@ -126,11 +127,15 @@ useEffect(()=>{
     
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-100 pt-10 p-4 w-full ">
-      <div className="w-[90%] h-fit bg-white shadow-lg rounded-lg p-6">
+    <div className="flex flex-col min-h-screen bg-gray-100 gap-24 items-center pt-10 p-4 w-full   "> 
+    <div className="relative flex w-[90%]">     <Link to={"/dashboard/posts"} className="text-black text-4xl px-2 py-4 text-center w-fit bg-sky-700 absolute right-0 top-0 border-none rounded-2xl cursor-pointer ">go to post page</Link >
+</div>
+      <div className="w-[90%] h-fit bg-white shadow-lg rounded-lg p-6 ">
+    
         <h2 className="text-xl font-semibold text-gray-700 mb-4 text-center">
           Create New Post
         </h2>
+
         <form onSubmit={handleSubmit} className="space-y-4 w-full">
           <div>
             <label htmlFor="title" className="block text-gray-600">Title:</label>
@@ -202,7 +207,7 @@ useEffect(()=>{
         </form>
         
       </div>
-    <Link to={"/dashboard/posts"} className="text-black text-4xl">go to post page</Link >
+    
     </div>
   );
 };

@@ -1,10 +1,13 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
+import {  useNavigate } from 'react-router-dom';
+import { AuthContext } from '../Context/Provider';
 
 function Signup() {
     const [username,setUsername]=useState("")
     const [email,setemail]=useState("")
     const [password,setpassword]=useState("")
-    
+    const{setToken}=useContext(AuthContext)
+    const navigate=useNavigate()
   
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -21,8 +24,16 @@ function Signup() {
           if (!response.ok) {
             throw new Error(data.message ); 
           }
-      
+          let token = data.data;
           console.log("Signup successful:", JSON.stringify(data));
+          localStorage.setItem("token",token)
+          setToken(data.data)
+         
+          
+          setUsername("")
+          setpassword("")
+          setemail("")
+          navigate("/")
         } catch (error) {
           console.error("Error:", error);
         }

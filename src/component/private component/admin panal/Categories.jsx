@@ -21,10 +21,10 @@ const navigate=useNavigate()
   const fetchCategories = async () => {
     try {
       const data = await getCatogeries();
-      console.log(data);
+      
       if (data && Array.isArray(data.data)) {
         setcategory(data.data); 
-        console.log(limit*(curruntPage + 1));
+       
     
         
       } 
@@ -47,7 +47,7 @@ const navigate=useNavigate()
 
   const handleUpdate = (categoryId) => {
     const singleCategory=category.find(e=>e.id==categoryId)
-    console.log(singleCategory);
+   
     
     setUpdateCategoriesData(singleCategory)
 navigate(`/dashboard/categories/update/${categoryId}`)

@@ -1,17 +1,23 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { AuthContext } from './Context/Provider';
 import { useParams } from 'react-router-dom';
+import CreateComment from './CreateComment';
+import Comments from './Comments';
 
 const PostDetails = () => {
   const { id } = useParams();
 //   const { postItem } = useContext(AuthContext);
 //   const [categoryName, setCategoryName] = useState('');
   const [posts, setPosts] = useState([]);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
   const [tags, setTags] = useState([]);
 //   const [currentPage, setCurrentPage] = useState(1);
 //   const itemsPerPage = 9;
   const base_Url = "http://ec2-3-76-10-130.eu-central-1.compute.amazonaws.com:4001";
 
+const updateTrigger=()=>{
+  setRefreshTrigger(prev=>prev + 1)
+}
 
 
   useEffect(() => {
@@ -85,10 +91,12 @@ const PostDetails = () => {
       </div>
     </div>
   ))}
+
 </div>
-
-
-      
+<div className='flex flex-col px-6 md:px-12'>
+<Comments postId={id} refreshTrigger={refreshTrigger} setRefreshTrigger={setRefreshTrigger}/>
+      <CreateComment postId={id} onCommentAdd={updateTrigger}/>
+    </div>
     </div>
   );
 };

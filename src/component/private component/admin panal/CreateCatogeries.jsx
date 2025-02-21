@@ -27,14 +27,11 @@ const CreateCategories = () => {
     
        
     
-     console.log(typeof name);
+   
      
-        const postData = {
-          name,
-         slug
-        };
     
-        console.log("Sending Post Data:", postData);
+    
+       
     
         
         const postApi = await fetch(
@@ -55,12 +52,12 @@ const CreateCategories = () => {
         if (!postApi.ok) {
           const errorResponse = await postApi.json();
           console.error("API Error Response:", errorResponse);
-          alert(`Post creation failed: ${errorResponse.message || "Unknown error"}`);
+          alert(`Category creation failed: ${errorResponse.message || "Unknown error"}`);
           return;
         }
     
         const responsePost = await postApi.json();
-        console.log("Post Created Successfully:", responsePost);
+        console.log("Category Created Successfully:", responsePost);
     
         alert("Post created successfully!");
         // navigate("/posts"); 
@@ -79,7 +76,7 @@ const CreateCategories = () => {
     <div className="flex justify-center min-h-screen bg-gray-100 pt-10 p-4 w-full">
       <div className="w-[90%] h-fit bg-white shadow-lg rounded-lg p-6">
         <h2 className="text-xl font-semibold text-gray-700 mb-4 text-center">
-          Create New Post
+          Create New Category
         </h2>
         <form onSubmit={handleSubmit} className="space-y-4 w-full">
           <div>

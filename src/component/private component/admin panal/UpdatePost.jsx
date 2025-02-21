@@ -9,20 +9,22 @@ const UpdatePost = () => {
   const [cover, setCover] = useState(null);
   const [categories, setCategories] = useState([]);
   const [tags, setTags] = useState("");
+  const [tagsArray, setTagsArray] = useState([]);
 const [categoryiesItem,setCategoriesItem]=useState([])
 const [singlePost,setSinglePost]=useState([])
 // const[loading,setLoading]=useState(false)
-  const { token } = useContext(AuthContext);
+  const { token,setRenderPostPage } = useContext(AuthContext);
  ;
+ 
   const {id}=useParams()
  const fetchCategories=async()=>{
-     
+ 
   const categoriesFetch=await getCatogeries()
-    console.log(categoriesFetch);
+    
     
  
  setCategoriesItem(categoriesFetch.data)
-  console.log(categoryiesItem);
+ 
   
  }
  const fetchPostsById=async()=>{
@@ -32,7 +34,7 @@ const [singlePost,setSinglePost]=useState([])
     
  
  setSinglePost(postFetch.data||[])
-  console.log(categoryiesItem);
+ 
   
  }
 
@@ -40,111 +42,121 @@ useEffect(()=>{
   fetchCategories()
   fetchPostsById()
 },[])
-    useEffect(() => {
-      if (singlePost && Object.keys(singlePost).length > 0) {
-        setTitle(singlePost.title || "");
-        setContent(singlePost.content || "");
-        setCategories(singlePost?.categories?.map((c) => c.category.id) || []);
-        setTags(singlePost.tags || "");
+useEffect(() => {
+  if (singlePost && Object.keys(singlePost).length > 0) {
+    let tagsText = [];
+
+    try {
+      if (singlePost.tags) {
+        const parsedTags = typeof singlePost.tags === "string" ? JSON.parse(singlePost.tags) : singlePost.tags;
+        const tags = Array.isArray(parsedTags) ? parsedTags : [];
+        setTagsArray(tags);
       }
-    }, [singlePost]);
-    const uploadImg = async () => {
+    } catch (error) {
+      console.error("Invalid tags format:", error);
+     setTagsArray([])
+    }
+
+    setTitle(singlePost.title || "");
+    setContent(singlePost.content || "");
+    // singlePost?.categories?.map((c) =>console.log( c.category.id));
+    console.log(typeof singlePost?.categories?.map((c) => c.category.id));
     
-      try {
-        if (!cover) {
-          alert("Please select a cover image");
-          return null;
-        }
-  
-        const formData = new FormData();
-        formData.append("cover", cover);
-  
-        const imgApi = await fetch(
-          "http://ec2-3-76-10-130.eu-central-1.compute.amazonaws.com:4001/api/v1/uploads/posts",
-          {
-            method: "POST",
-            headers: {
-              "Authorization": `Bearer ${token}`,
-            //  'Content-Type': multipart/form-data
-            },
-            body: formData,
-          }
-        );
-  
-        const imgResponse = await imgApi.json();
-       
-  console.log(imgResponse);
-  
-        if (!imgResponse.data) {
-          throw new Error("Image upload failed: No valid data returned");
-        }
-  
-        return imgResponse.data; 
-  
-      } catch (error) {
-        console.error("Image Upload Error:", error);
-        return null;
+    setCategories( singlePost?.categories?.map((c) => c.category.id)||[]);
+
+    setTags(typeof tagsArray=='object'? tagsArray.join(",") : "");
+  }
+}, [singlePost]);
+
+
+const uploadImg = async () => {
+  try {
+    if (!cover) {
+      console.warn("No cover image selected.");
+      return null;
+    }
+
+    const formData = new FormData();
+    formData.append("cover", cover);
+
+    const imgApi = await fetch(
+      "http://ec2-3-76-10-130.eu-central-1.compute.amazonaws.com:4001/api/v1/uploads/posts",
+      {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+        body: formData,
       }
+    );
+
+    if (!imgApi.ok) {
+      throw new Error(`Image upload failed: ${imgApi.statusText}`);
+    }
+
+    const imgResponse = await imgApi.json();
+    return imgResponse.data || null;
+  } catch (error) {
+    console.error("Image Upload Error:", error);
+    return null;
+  }
+};
+
+const handleSubmit = async (event) => {
+  event.preventDefault();
+  if (!title || !content || categories.length === 0) {
+    alert("Title, content, and at least one category are required.");
+    return;
+  }
+
+  try {
+    const tagsArray = tags.split(",").map(tag => tag.trim()).filter(Boolean);
+    if (tagsArray.length === 0) {
+      alert("At least one tag is required.");
+      return;
+    }
+
+    const imageUrl = cover ? await uploadImg() : singlePost.cover;
+    if (!imageUrl) return;
+
+    const postData = {
+      title,
+      content,
+      cover: imageUrl,
+      published: true,
+      categories: categories.map(Number),
+      tags: tagsArray,
+      // id:Number(id)
     };
-  
- 
-    const handleSubmit = async (event) => {
-      event.preventDefault();
+   
     
-      if (!title && !content && categories.length === 0) {
-        alert("Title, content, and at least one category are required.");
-        return;
+    const postApi = await fetch(
+      `http://ec2-3-76-10-130.eu-central-1.compute.amazonaws.com:4001/api/v1/posts/${id}`,
+      {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(postData),
       }
-    
-      try {
-        const tagsArray = tags.split(",").map((tag) => tag.trim()).filter(Boolean);
-        if (tagsArray.length === 0) {
-          alert("At least one tag is required.");
-          return;
-        }
-    
-        const imageUrl = await uploadImg();
-        if (!imageUrl) return;
-    
-        const postData = {
-          title,
-          content,
-          cover: imageUrl, 
-          published: true,
-          categories:categories.map(Number),
-          tags: tagsArray
-        };
-    
-        console.log("Sending Post Data:", postData,"current post data",singlePost);
-    
-        const postApi = await fetch(
-          `http://ec2-3-76-10-130.eu-central-1.compute.amazonaws.com:4001/api/v1/posts/${id}`,
-          {
-            method: "PATCH",
-            headers: {
-              "Content-Type": "application/json",
-              "Authorization": `Bearer ${token}`,
-            },
-            body: JSON.stringify(postData),
-          }
-        );
-        // setLoading(true)
-        if (!postApi.ok) {
-          const errorResponse = await postApi.json();
-          throw new Error(`Post updated failed: ${errorResponse.message || "Unknown error"}`);
-        }
-    
-        const responsePost = await postApi.json();
-        console.log("Post Updated Successfully:", responsePost);
-    
-        alert("Post Updated successfully!");
-    
-      } catch (error) {
-        console.error("Error:", error);
-        alert(error.message || "Something went wrong");
-      }
-    };
-    
+    );
+
+    if (!postApi.ok) {
+      const errorResponse = await postApi.json();
+      throw new Error(`Post update failed: ${errorResponse.message || "Unknown error"}`);
+    }
+
+    const responsePost = await postApi.json();
+    console.log("Post Updated Successfully:", responsePost);
+
+    alert("Post Updated successfully!");
+    setRenderPostPage(prev=>prev+1)
+navigate("/dashboard/posts")
+  } catch (error) {
+    console.error("Error:", error);
+    alert(error.message || "Something went wrong");
+  }
+};
+
     
 
   return (

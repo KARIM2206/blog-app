@@ -6,13 +6,12 @@ import { Outlet } from "react-router-dom";
 const LayoutNavbar = () => {
   return (
     <div className="flex flex-col h-screen">
-      {/* Navbar with Fixed Height */}
-      <header className="h-16 shadow-md  text-white">
+    
+      <header className="h-16 shadow-md  sm:h-14 text-white">
         <Navbar />
       </header>
 
-      {/* Main Content that Fills Remaining Space */}
-      <main className="flex-1 overflow-auto p-4 bg-gray-100">
+      <main className="flex-1 overflow-auto  bg-gray-100">
         <Outlet />
       </main>
     </div>

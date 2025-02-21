@@ -9,38 +9,50 @@ const CategorySlug = () => {
   const [categoryName, setCategoryName] = useState('');
   const [posts, setPosts] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 9;
+  const limit = 9;
   const base_Url = "http://ec2-3-76-10-130.eu-central-1.compute.amazonaws.com:4001";
 
-  // Fetch posts by category slug
+
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const response = await axios.get(`${base_Url}/api/v1/posts?category=${slug}`);
-        if (response.data) {
-          setPosts(response.data);
-          // Set category name from the first post
-          if (response.data.length > 0) {
-            setCategoryName(response.data[0].categories[0]?.category.name || '');
+        const response = await fetch(
+          `http://ec2-3-76-10-130.eu-central-1.compute.amazonaws.com:4001/api/v1/posts?limit=${limit}&page=${currentPage}&categorySlug=${slug}`
+        );
+        
+        if (!response.ok) {
+          throw new Error("Failed to fetch posts");
+        }
+  
+        const data = await response.json(); 
+  
+        if (data) {
+          setPosts(data.data.posts);
+          console.log("Fetched Posts:", data); 
+  
+          if (data.length > 0) {
+            setCategoryName(data[0]?.categories[0]?.category?.name || "");
           }
         }
       } catch (error) {
         console.error("Error fetching posts:", error);
       }
     };
-
+  
     fetchPosts();
-  }, [slug]);
+  }, []); 
+  
+  console.log(posts); 
+  
+  
+  const indexOfLastPost = currentPage * limit;
+  const indexOfFirstPost = indexOfLastPost - limit;
+  const currentPosts = [];
 
-  // Pagination Logic
-  const indexOfLastPost = currentPage * itemsPerPage;
-  const indexOfFirstPost = indexOfLastPost - itemsPerPage;
-  const currentPosts = posts.slice(1).slice(indexOfFirstPost, indexOfLastPost);
+  
+  const slice = posts.slice(0,1);
 
-  // Hero Post
-  const heroPost = posts.length > 0 ? posts[0] : null;
 
-  // Function to trim content (without cutting words)
   const trimContent = (text, maxLength = 120) => {
     if (text.length <= maxLength) return text;
     const trimmed = text.substr(0, text.lastIndexOf(' ', maxLength)) + '...';
@@ -49,28 +61,56 @@ const CategorySlug = () => {
 
   return (
     <div className='flex flex-col px-[12px]'>
-      {/* Category Name */}
       {categoryName && (
         <h1 className="text-4xl font-bold text-center my-4">{categoryName}</h1>
       )}
-
-      {/* Hero Section */}
-      {heroPost && (
-        <div key={heroPost.id} className="mb-6">
-          <div className='w-full flex items-center justify-center h-auto bg-gradient-to-t from-gray-300 to-gray-500'>
-            <img src={`${base_Url}/uploads/posts/${heroPost.cover}`} alt="hero cover" className='w-[70%] h-auto rounded-lg' />
+  <div className="w-full">
+      {slice.map((e) => (
+        <div key={e.id} className="rounded-3xl overflow-hidden shadow-lg bg-white">
+        
+          <div className="w-full flex items-center justify-center h-auto bg-gradient-to-t from-gray-300 to-gray-500 rounded-3xl">
+            <img
+              src={`${base_Url}/uploads/posts/${e.cover}`}
+              alt="Post Cover"
+              className="w-full h-60 object-cover rounded-3xl"
+            />
           </div>
+  
+         
           <div className="flex flex-col gap-4 py-2 px-4 bg-gray-500">
-            <div className='flex justify-between'>
-              <p className='text-sky-800'>{heroPost.author.username}</p>
-              <p>{new Date(heroPost.createdAt).toLocaleDateString()}</p>
+          
+            <div className="flex w-full justify-between items-center">
+              <div className="flex gap-2 items-center">
+                <p className="text-sky-800 font-semibold">{e.author.username}</p>
+              
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {/* {e.categories.map((c) => (
+                  <p key={c.category.id} className="bg-gray-700 text-white px-2 py-1 text-xs rounded">
+                    {c.category.name}
+                  </p>
+                ))} */}
+                  <p>{new Date(e.createdAt).toLocaleDateString()}</p>
+              </div>
             </div>
-            <h2 className='text-3xl font-extrabold'>{heroPost.title}</h2>
+  
+           
+            <div className="text-2xl font-extrabold break-words whitespace-normal text-white">
+              {e.title}
+            </div>
+            <div className="text-2xl font-extrabold break-words whitespace-normal text-grey-300">
+              {e.content.length>100?e.content.substr(0,100)+"...":e.content}
+            </div>
+            
           </div>
         </div>
-      )}
+      ))}
+    </div>
+      
 
-      {/* Posts Grid */}
+     
+
+   
       <div className="w-full grid grid-cols-3 gap-4">
         {currentPosts.map((post) => (
           <div key={post.id} className="bg-white shadow-lg rounded-lg p-4">
@@ -85,8 +125,8 @@ const CategorySlug = () => {
         ))}
       </div>
 
-      {/* Pagination */}
-      <div className="flex justify-center mt-6">
+      
+      {/* <div className="flex justify-center mt-6">
         {Array.from({ length: Math.ceil((posts.length - 1) / itemsPerPage) }, (_, index) => (
           <button
             key={index}
@@ -96,7 +136,7 @@ const CategorySlug = () => {
             {index + 1}
           </button>
         ))}
-      </div>
+      </div> */}
     </div>
   );
 };

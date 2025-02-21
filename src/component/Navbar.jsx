@@ -4,6 +4,7 @@ import { AuthContext } from "./Context/Provider";
 
 const Navbar = () => {
   const { user,setUser ,token,setToken} = useContext(AuthContext); 
+
   
   const {isLogged,setIsLogged}=useContext(AuthContext)
   const [loading, setLoading] = useState(true); 
@@ -25,16 +26,17 @@ const handleLogout = () => {
   return (
     <header className=" w-[100%] ">
       <div className="w-full px-4 items-center">
-        <div className="flex h-16 items-center justify-between">
-          <div className="flex-1 md:flex md:items-center md:gap-12">
-            <Link to="/" className="w-12 h-auto">
-              <img
-                src="/blogger.png"
-                alt="blog icon"
-                className="w-full h-auto object-cover"
-              />
-            </Link>
-          </div>
+        <div className="flex h-16  items-center justify-between">
+        <div className=" flex items-center justify-center md:justify-start gap-6">
+  <Link to="/" className="w-14 sm:w-12 md:w-10 lg:w-12">
+    <img
+      src="/blogger.png"
+      alt="blog icon"
+      className="w-full h-auto object-contain"
+    />
+  </Link>
+</div>
+
 
           <div className="md:flex md:items-center md:gap-12">
             <div className="flex items-center gap-4">

@@ -7,10 +7,7 @@ const Dashboard = () => {
   const [users, setusers] = useState([]);
   const [categories, setcategories] = useState([]);
 
-  
-  // console.log(posts);
-
-  // console.log(users);
+ 
   
   useEffect(() => {
     const fetchCategories = async () => {

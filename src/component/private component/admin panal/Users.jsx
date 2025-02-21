@@ -8,7 +8,7 @@ const Users = () => {
   const [users, setUsers] = useState([]);
 const [isUpdated,setIsUpdated]=useState(false)
 const [userId,setUserId]=useState("")
-
+const[renderUserPage,setRenderUserPage]=useState(0)
   const [curruntPage,setCurruntPage]=useState(1)
 const limit=10
  const totalPage=Math.ceil(users.length / limit)
@@ -22,7 +22,7 @@ const [updateRole,setUpdateRole]=useState("")
   const fetchUsers = async () => {
     try {
       const data = await getUsers();
-      console.log(data);
+     
       if (data && Array.isArray(data.data)) {
         setUsers(data.data); 
       } 
@@ -37,7 +37,7 @@ const [updateRole,setUpdateRole]=useState("")
   useEffect(() => {
     fetchUsers();
     // console.log(users);
-  }, []);
+  }, [renderUserPage]);
 
 
 
@@ -53,7 +53,7 @@ if (userArray) {
 
   };
 
-      console.log(updateRole);
+  
 const updateUser=async(event)=>{
   event.preventDefault();
   try{
@@ -86,6 +86,7 @@ const updateUser=async(event)=>{
     console.log("Post Updated Successfully:", responsePost);
 
     alert("Updated Role User successfully!");
+    setRenderUserPage(prev=>prev+1)
     // navigate("/dashboard/posts");
     setIsUpdated(false)
   } catch (error) {
